@@ -1,1 +1,32 @@
-"I'm building an AI model that surpasses existing AI capabilities, leveraging cutting-edge technologies to deliver unparalleled performance, accuracy, and efficiency. This AI will excel in [specific areas, e.g., natural language processing, computer vision, or predictive analytics], providing innovative solutions for [target applications or industries]. With advanced learning algorithms and robust data processing, this AI aims to r
+```python
+# chatbot.py
+
+import json
+
+class SpurAIChatbot:
+    def __init__(self):
+        self.knowledge_base = {
+            "hello": "Hi! Welcome to SpurAI.",
+            "what's your name": "I'm SpurAI, your friendly chatbot.",
+            "goodbye": "Catch you later. Thanks for chatting!",
+}
+
+    def respond(self, user_input):
+        user_input = user_input.strip().lower()
+        return self.knowledge_base.get(user_input, "I'm still learning. Can you rephrase that?")
+
+def main():
+    print("🤖 SpurAI Chatbot is active. Type 'exit' to quit.")
+    bot = SpurAIChatbot()
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() in ["exit", "quit"]:
+            print("SpurAI: Chat ended. Goodbye!")
+            break
+        print("SpurAI:", bot.respond(user_input))
+
+if __name__ == "__main__":
+    main()
+```
+
+*🧠
