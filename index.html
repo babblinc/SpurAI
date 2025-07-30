@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spur AI - Chat Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .sidebar-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .mobile-menu-enter {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        
+        .mobile-menu-enter-active {
+            transform: translateY(0);
+            opacity: 1;
+            transition: all 0.3s ease-out;
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        
+        .tooltip-trigger:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .chat-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .nav-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+        
+        .sidebar-collapsed .nav-label {
+            display: none !important;
+        }
+        
+        .sidebar-collapsed .tooltip {
+            display: block;
+        }
+        
+        .sidebar-expanded .tooltip {
+            display: none !important;
+        }
+        
+        .sidebar-collapsed .recent-chats-section {
+            display: none !important;
+        }
+        
+        .sidebar-collapsed .user-details {
+            display: none !important;
+        }
+        
+        .sidebar-collapsed .sidebar-title {
+            display: none !important;
+        }
+        
+        .sidebar-collapsed {
+            width: 70px !important;
+        }
+        
+        .sidebar-expanded {
+            width: 280px !important;
+        }
+        
+        @media (max-width: 899px) {
+            .desktop-sidebar {
+                display: none !important;
+            }
+            .mobile-header {
+                display: flex !important;
+            }
+        }
+        
+        @media (min-width: 900px) {
+            .desktop-sidebar {
+                display: flex !important;
+            }
+            .mobile-header {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Desktop Sidebar -->
+    <div id="sidebar" class="desktop-sidebar fixed left-0 top-0 h-full bg-white border-r border-gray-200 sidebar-transition z-40 flex-col shadow-lg sidebar-expanded">
+        <!-- Sidebar Header -->
+        <div class="p-4 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-brain text-white text-lg"></i>
+                    </div>
+                    <span class="sidebar-title text-xl font-semibold text-gray-800">Spur AI</span>
+                </div>
+                <button id="sidebar-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-chevron-left text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Navigation Items -->
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-2 px-3">
+                <!-- New Chat -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-plus nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">New Chat</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        New Chat
+                    </div>
+                </div>
+                
+                <!-- Previous Chats -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-history nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">Previous Chats</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        Previous Chats
+                    </div>
+                </div>
+                
+                <!-- Search Chat -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-search nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">Search Chat</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        Search Chat
+                    </div>
+                </div>
+                
+                <!-- Library -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-bookmark nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">Library</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        Library
+                    </div>
+                </div>
+                
+                <!-- About -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-info-circle nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">About</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        About
+                    </div>
+                </div>
+                
+                <!-- Settings -->
+                <div class="nav-item relative tooltip-trigger">
+                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-cog nav-icon text-gray-600"></i>
+                        <span class="nav-label font-medium">Settings</span>
+                    </button>
+                    <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                        Settings
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Recent Chats Section -->
+            <div class="recent-chats-section mt-6 px-3">
+                <div class="border-t border-gray-100 pt-4">
+                    <h3 class="text-sm font-semibold text-gray-500 mb-3">Recent Chats</h3>
+                    <div class="space-y-1">
+                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
+                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
+                            <span class="truncate">How to learn HTML</span>
+                        </div>
+                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
+                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
+                            <span class="truncate">React Project Help</span>
+                        </div>
+                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
+                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
+                            <span class="truncate">CSS Layout Fixes</span>
+                        </div>
+                        <button class="text-xs text-blue-600 hover:text-blue-700 mt-2 font-medium">
+                            See more →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Info Footer -->
+        <div class="border-t border-gray-100 p-4">
+            <div class="flex items-center space-x-3 relative tooltip-trigger">
+                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-user text-blue-600"></i>
+                </div>
+                <div class="user-details flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-800 truncate">John Doe</div>
+                    <div class="text-xs text-gray-500 truncate">john@example.com</div>
+                </div>
+                <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
+                    John Doe
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Header -->
+    <div class="mobile-header bg-white border-b border-gray-200 px-4 py-3 shadow-sm" style="display: none;">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-brain text-white"></i>
+                    </div>
+                    <span class="text-lg font-semibold text-gray-800">Spur AI</span>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="New Chat">
+                        <i class="fas fa-plus text-gray-600"></i>
+                    </button>
+                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Previous Chats">
+                        <i class="fas fa-history text-gray-600"></i>
+                    </button>
+                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Search Chat">
+                        <i class="fas fa-search text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button id="mobile-menu-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <i class="fas fa-bars text-gray-600"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="bg-white w-full max-w-sm ml-auto h-full shadow-xl">
+            <div class="p-4 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-brain text-white"></i>
+                        </div>
+                        <span class="text-lg font-semibold text-gray-800">Spur AI</span>
+                    </div>
+                    <button id="mobile-menu-close" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="py-4">
+                <div class="space-y-1 px-4">
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-plus text-gray-600"></i>
+                        <span class="font-medium">New Chat</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-history text-gray-600"></i>
+                        <span class="font-medium">Previous Chats</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-search text-gray-600"></i>
+                        <span class="font-medium">Search Chat</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-bookmark text-gray-600"></i>
+                        <span class="font-medium">Library</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-info-circle text-gray-600"></i>
+                        <span class="font-medium">About</span>
+                    </button>
+                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        <i class="fas fa-cog text-gray-600"></i>
+                        <span class="font-medium">Settings</span>
+                    </button>
+                </div>
+                
+                <div class="border-t border-gray-100 mt-6 pt-6 px-4">
+                    <div class="flex items-center space-x-3 px-3 py-2">
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-800">John Doe</div>
+                            <div class="text-xs text-gray-500">john@example.com</div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div id="main-content" class="sidebar-transition" style="margin-left: 280px;">
+        <div class="p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-brain text-white text-3xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Spur AI</h1>
+                        <p class="text-gray-600 mb-8">Start a conversation or browse your previous chats</p>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-plus"></i>
+                                <span>Start New Chat</span>
+                            </button>
+                            <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                                <i class="fas fa-history"></i>
+                                <span>View Previous Chats</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // State management
+        let sidebarOpen = localStorage.getItem('sidebarOpen') !== 'false';
+        let mobileMenuOpen = false;
+        
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mainContent = document.getElementById('main-content');
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuClose = document.getElementById('mobile-menu-close');
+        
+        // Initialize sidebar state
+        function initializeSidebar() {
+            if (window.innerWidth >= 900) {
+                updateSidebarState();
+            }
+        }
+        
+        // Update sidebar state
+        function updateSidebarState() {
+            const toggleIcon = sidebarToggle.querySelector('i');
+            
+            if (sidebarOpen) {
+                sidebar.classList.remove('sidebar-collapsed');
+                sidebar.classList.add('sidebar-expanded');
+                mainContent.style.marginLeft = '280px';
+                toggleIcon.className = 'fas fa-chevron-left text-gray-600';
+            } else {
+                sidebar.classList.remove('sidebar-expanded');
+                sidebar.classList.add('sidebar-collapsed');
+                mainContent.style.marginLeft = '70px';
+                toggleIcon.className = 'fas fa-chevron-right text-gray-600';
+            }
+            
+            // Save state
+            localStorage.setItem('sidebarOpen', sidebarOpen);
+        }
+        
+        // Toggle sidebar
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            updateSidebarState();
+        }
+        
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            mobileMenuOpen = !mobileMenuOpen;
+            if (mobileMenuOpen) {
+                mobileMenu.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            } else {
+                mobileMenu.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+        
+        // Event listeners
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+        mobileMenuClose.addEventListener('click', toggleMobileMenu);
+        
+        // Close mobile menu when clicking outside
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                toggleMobileMenu();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 900) {
+                // Desktop view
+                mobileMenu.classList.add('hidden');
+                mobileMenuOpen = false;
+                document.body.style.overflow = 'auto';
+                updateSidebarState();
+            } else {
+                // Mobile view
+                mainContent.style.marginLeft = '0';
+            }
+        });
+        
+        // Sample button interactions
+        document.querySelectorAll('button').forEach(button => {
+            if (!button.id || !['sidebar-toggle', 'mobile-menu-toggle', 'mobile-menu-close'].includes(button.id)) {
+                button.addEventListener('click', (e) => {
+                    const buttonText = button.textContent.trim();
+                    if (buttonText && !buttonText.includes('See more')) {
+                        alert(`${buttonText} clicked! This would open the ${buttonText.toLowerCase()} feature.`);
+                    }
+                });
+            }
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeSidebar);
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9677028a1698c8ed',t:'MTc1MzkwMTA5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
