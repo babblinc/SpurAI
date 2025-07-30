@@ -71,6 +71,10 @@
             display: none !important;
         }
         
+        .sidebar-collapsed .hamburger-menu {
+            display: none !important;
+        }
+        
         .sidebar-collapsed {
             width: 70px !important;
         }
@@ -85,6 +89,11 @@
         
         .modal.show {
             display: flex;
+        }
+        
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
         }
         
         @media (max-width: 899px) {
@@ -118,17 +127,15 @@
     <div id="sidebar" class="desktop-sidebar fixed left-0 top-0 h-full bg-white border-r border-gray-200 sidebar-transition z-40 flex-col shadow-lg sidebar-expanded">
         <!-- Sidebar Header -->
         <div class="p-4 border-b border-gray-100">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
-                        <i class="fas fa-robot text-white text-lg"></i>
-                    </div>
-                    <span class="sidebar-title text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Spur AI</span>
+            <div class="flex items-center space-x-3 mb-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-robot text-white text-lg"></i>
                 </div>
+                <span class="sidebar-title text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Spur AI</span>
             </div>
-            <button id="sidebar-toggle" class="mt-2 p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 text-gray-600">
+            <button id="sidebar-toggle" class="hamburger-menu p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 text-gray-600 w-full">
                 <i class="fas fa-bars"></i>
-                <span class="sidebar-title text-sm">Toggle Menu</span>
+                <span class="text-sm">Toggle Menu</span>
             </button>
         </div>
         
@@ -137,7 +144,7 @@
             <nav class="space-y-2 px-3">
                 <!-- New Chat -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="new-chat-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-plus nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">New Chat</span>
                     </button>
@@ -148,7 +155,7 @@
                 
                 <!-- Previous Chats -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="previous-chats-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-history nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">Previous Chats</span>
                     </button>
@@ -159,7 +166,7 @@
                 
                 <!-- Search Chat -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="search-chat-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-search nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">Search Chat</span>
                     </button>
@@ -170,7 +177,7 @@
                 
                 <!-- Library -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="library-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-bookmark nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">Library</span>
                     </button>
@@ -192,7 +199,7 @@
                 
                 <!-- Settings -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="settings-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-cog nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">Settings</span>
                     </button>
@@ -207,21 +214,7 @@
                 <div class="border-t border-gray-100 pt-4">
                     <h3 class="text-sm font-semibold text-gray-500 mb-3">Recent Chats</h3>
                     <div class="space-y-1" id="recent-chats-list">
-                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
-                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
-                            <span class="truncate">How to learn HTML</span>
-                        </div>
-                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
-                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
-                            <span class="truncate">React Project Help</span>
-                        </div>
-                        <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
-                            <i class="fas fa-comment-dots text-xs text-gray-400"></i>
-                            <span class="truncate">CSS Layout Fixes</span>
-                        </div>
-                        <button class="text-xs text-blue-600 hover:text-blue-700 mt-2 font-medium">
-                            See more →
-                        </button>
+                        <!-- Recent chats will be populated here -->
                     </div>
                 </div>
             </div>
@@ -282,19 +275,19 @@
             
             <nav class="py-4">
                 <div class="space-y-1 px-4">
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-new-chat-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-plus text-gray-600"></i>
                         <span class="font-medium">New Chat</span>
                     </button>
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-previous-chats-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-history text-gray-600"></i>
                         <span class="font-medium">Previous Chats</span>
                     </button>
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-search-chat-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-search text-gray-600"></i>
                         <span class="font-medium">Search Chat</span>
                     </button>
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-library-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-bookmark text-gray-600"></i>
                         <span class="font-medium">Library</span>
                     </button>
@@ -302,7 +295,7 @@
                         <i class="fas fa-info-circle text-gray-600"></i>
                         <span class="font-medium">About</span>
                     </button>
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-settings-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-cog text-gray-600"></i>
                         <span class="font-medium">Settings</span>
                     </button>
@@ -329,7 +322,7 @@
     <!-- Main Content Area -->
     <div id="main-content" class="main-content sidebar-transition" style="margin-left: 280px;">
         <!-- Chat Interface -->
-        <div class="flex flex-col h-screen">
+        <div class="flex flex-col h-screen" id="chat-interface">
             <!-- Chat Messages Area -->
             <div class="flex-1 overflow-y-auto p-4" id="chat-messages">
                 <div class="max-w-4xl mx-auto space-y-4">
@@ -345,7 +338,7 @@
                     <!-- Sample Messages -->
                     <div class="flex justify-start">
                         <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
-                            <p class="text-gray-800">Hello! I'm Spur AI. How can I assist you today?</p>
+                            <p class="text-gray-800">Hello! I'm Spur AI. I've been trained on various topics and I'm ready to help you. What would you like to know?</p>
                             <span class="text-xs text-gray-500 mt-1 block">Just now</span>
                         </div>
                     </div>
@@ -374,6 +367,71 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Previous Chats View -->
+        <div id="previous-chats-view" class="hidden p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Previous Chats</h2>
+                    <div id="previous-chats-content" class="space-y-3">
+                        <!-- Previous chats will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search View -->
+        <div id="search-view" class="hidden p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Search Chats</h2>
+                    <div class="mb-6">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            placeholder="Search your conversations..." 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+                    <div id="search-results" class="search-results space-y-3">
+                        <p class="text-gray-500 text-center py-8">Enter a search term to find your conversations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Library View -->
+        <div id="library-view" class="hidden p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Knowledge Library</h2>
+                    <div id="library-content" class="space-y-4">
+                        <!-- Library content will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Settings View -->
+        <div id="settings-view" class="hidden p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Settings</h2>
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-cog text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">Settings Coming Soon</h3>
+                        <p class="text-gray-500">Advanced settings and customization options will be available here!</p>
+                        <div class="mt-6">
+                            <button id="clear-data-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                Clear All Chat Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <!-- About Modal -->
@@ -384,7 +442,7 @@
                     <i class="fas fa-robot text-white text-3xl"></i>
                 </div>
                 <h2 class="text-2xl font-bold text-gray-800 mb-3">About Spur AI</h2>
-                <p class="text-gray-600 mb-4">Spur AI is an advanced conversational AI assistant designed to help you with various tasks, answer questions, and provide intelligent insights.</p>
+                <p class="text-gray-600 mb-4">Spur AI is an advanced conversational AI assistant designed to help you with various tasks, answer questions, and provide intelligent insights based on trained data.</p>
                 
                 <div class="space-y-2 mb-6">
                     <p class="text-sm text-gray-500">Learn more about our AI technology:</p>
@@ -440,11 +498,350 @@
         </div>
     </div>
     
+    <!-- AI Training Data -->
     <script>
+        // AI Training Data - You can modify this to train the AI
+        window.aiTrainingData = [
+            {
+                question: "What is Spur AI?",
+                answer: "Spur AI is an advanced conversational AI assistant created by Babbl Soft. I'm designed to help you with various tasks, answer questions, and provide intelligent insights. I can understand natural language and provide helpful responses based on my training data."
+            },
+            {
+                question: "What can Spur AI do?",
+                answer: "I can help you with many things! I can answer questions, have conversations, help with problem-solving, provide information on topics I've been trained on, assist with writing tasks, and much more. Just ask me anything and I'll do my best to help!"
+            },
+            {
+                question: "Who created Spur AI?",
+                answer: "I was created by Babbl Soft, a technology company focused on AI solutions. You can learn more about them at babblsoft.com and their AI studio at aistudio.babblsoft.com."
+            },
+            {
+                question: "How does Spur AI work?",
+                answer: "I work by analyzing your messages and finding the best responses from my training data. I use advanced matching algorithms that look at keywords, context, and meaning to understand what you're asking and provide relevant answers."
+            },
+            {
+                question: "Can Spur AI learn?",
+                answer: "Yes! I can learn from our conversations. Each chat we have helps me understand better ways to respond. My training data can also be updated to include new information and improve my responses over time."
+            },
+            {
+                question: "What is artificial intelligence?",
+                answer: "Artificial Intelligence (AI) is technology that enables machines to simulate human intelligence. It includes capabilities like learning, reasoning, problem-solving, and understanding language. AI systems like me can process information and respond in ways that seem intelligent and helpful."
+            },
+            {
+                question: "How do I use Spur AI?",
+                answer: "Using me is simple! Just type your question or message in the chat box and press send. I'll analyze what you're asking and provide the best response I can. You can ask me about anything - from general questions to specific topics I've been trained on."
+            },
+            {
+                question: "Is Spur AI free to use?",
+                answer: "Yes, I'm currently free to use! You can chat with me, save conversations, and access all my features without any cost. Just start typing and we can begin our conversation right away."
+            },
+            {
+                question: "Can I save my conversations with Spur AI?",
+                answer: "Absolutely! All your conversations with me are automatically saved in your browser. You can access them anytime through the 'Previous Chats' section in the sidebar. You can also search through your chat history to find specific conversations."
+            },
+            {
+                question: "What topics can Spur AI help with?",
+                answer: "I can help with a wide variety of topics! This includes general knowledge questions, technology, AI concepts, problem-solving, writing assistance, and much more. My knowledge comes from my training data, so feel free to ask about anything and I'll let you know if I can help!"
+            }
+        ];
+    </script>
+    
+    <script>
+        // AI System with Learning Capabilities
+        class SpurAI {
+            constructor() {
+                this.trainingData = window.aiTrainingData || [];
+                this.conversations = JSON.parse(localStorage.getItem('conversations')) || [];
+                this.currentChatId = null;
+            }
+            
+            // Find best response based on training data
+            findBestResponse(userMessage) {
+                const message = userMessage.toLowerCase();
+                let bestMatch = null;
+                let highestScore = 0;
+                
+                for (const data of this.trainingData) {
+                    const question = data.question ? data.question.toLowerCase() : '';
+                    
+                    // Calculate multiple types of similarity
+                    const exactScore = this.calculateSimilarity(message, question);
+                    const keywordScore = this.calculateKeywordMatch(message, question);
+                    const semanticScore = this.calculateSemanticMatch(message, question);
+                    
+                    // Weighted combination of scores
+                    const finalScore = (exactScore * 0.4) + (keywordScore * 0.4) + (semanticScore * 0.2);
+                    
+                    if (finalScore > highestScore && finalScore > 0.3) {
+                        highestScore = finalScore;
+                        bestMatch = data;
+                    }
+                }
+                
+                if (bestMatch) {
+                    return bestMatch.answer || "I understand what you're asking about.";
+                }
+                
+                return this.getDefaultResponse();
+            }
+            
+            // Calculate similarity between two strings
+            calculateSimilarity(str1, str2) {
+                const words1 = str1.split(' ').filter(word => word.length > 2);
+                const words2 = str2.split(' ').filter(word => word.length > 2);
+                let matches = 0;
+                
+                for (const word1 of words1) {
+                    for (const word2 of words2) {
+                        if (word1.includes(word2) || word2.includes(word1) || 
+                            this.levenshteinDistance(word1, word2) <= 2) {
+                            matches++;
+                        }
+                    }
+                }
+                
+                return matches / Math.max(words1.length, words2.length);
+            }
+            
+            // Calculate keyword-based matching
+            calculateKeywordMatch(userMessage, questionText) {
+                const userWords = this.extractKeywords(userMessage);
+                const questionWords = this.extractKeywords(questionText);
+                
+                let matches = 0;
+                let totalKeywords = Math.max(userWords.length, questionWords.length);
+                
+                for (const userWord of userWords) {
+                    for (const questionWord of questionWords) {
+                        // Exact match
+                        if (userWord === questionWord) {
+                            matches += 1;
+                        }
+                        // Partial match (one contains the other)
+                        else if (userWord.includes(questionWord) || questionWord.includes(userWord)) {
+                            matches += 0.8;
+                        }
+                        // Similar words (small edit distance)
+                        else if (this.levenshteinDistance(userWord, questionWord) <= 1 && userWord.length > 3) {
+                            matches += 0.6;
+                        }
+                    }
+                }
+                
+                return totalKeywords > 0 ? matches / totalKeywords : 0;
+            }
+            
+            // Calculate semantic matching using common patterns
+            calculateSemanticMatch(userMessage, questionText) {
+                // Common question patterns and their variations
+                const patterns = [
+                    { base: ['what', 'is'], variations: ['whats', 'what\'s', 'define', 'explain', 'tell me about'] },
+                    { base: ['how', 'to'], variations: ['how do i', 'how can i', 'steps to', 'way to'] },
+                    { base: ['why'], variations: ['why do', 'why does', 'reason for', 'because'] },
+                    { base: ['where'], variations: ['where is', 'where can', 'location of'] },
+                    { base: ['when'], variations: ['when do', 'when does', 'time for'] },
+                    { base: ['who'], variations: ['who is', 'who are', 'person'] }
+                ];
+                
+                let semanticScore = 0;
+                
+                for (const pattern of patterns) {
+                    const userHasPattern = this.hasPattern(userMessage, [...pattern.base, ...pattern.variations]);
+                    const questionHasPattern = this.hasPattern(questionText, [...pattern.base, ...pattern.variations]);
+                    
+                    if (userHasPattern && questionHasPattern) {
+                        semanticScore += 0.5;
+                    }
+                }
+                
+                return Math.min(semanticScore, 1.0);
+            }
+            
+            // Extract meaningful keywords from text
+            extractKeywords(text) {
+                const stopWords = ['the', 'is', 'at', 'which', 'on', 'and', 'a', 'to', 'are', 'as', 'was', 'with', 'for', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'of', 'in', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'an', 'but', 'or', 'so', 'than', 'too', 'very', 'just', 'now', 'then', 'there', 'here', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now'];
+                
+                return text.toLowerCase()
+                    .replace(/[^\w\s]/g, ' ')
+                    .split(/\s+/)
+                    .filter(word => word.length > 2 && !stopWords.includes(word))
+                    .filter(word => word.trim() !== '');
+            }
+            
+            // Check if text contains any of the given patterns
+            hasPattern(text, patterns) {
+                const lowerText = text.toLowerCase();
+                return patterns.some(pattern => {
+                    if (typeof pattern === 'string') {
+                        return lowerText.includes(pattern);
+                    }
+                    return false;
+                });
+            }
+            
+            // Calculate edit distance between words
+            levenshteinDistance(str1, str2) {
+                const matrix = [];
+                
+                for (let i = 0; i <= str2.length; i++) {
+                    matrix[i] = [i];
+                }
+                
+                for (let j = 0; j <= str1.length; j++) {
+                    matrix[0][j] = j;
+                }
+                
+                for (let i = 1; i <= str2.length; i++) {
+                    for (let j = 1; j <= str1.length; j++) {
+                        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                            matrix[i][j] = matrix[i - 1][j - 1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i - 1][j - 1] + 1,
+                                matrix[i][j - 1] + 1,
+                                matrix[i - 1][j] + 1
+                            );
+                        }
+                    }
+                }
+                
+                return matrix[str2.length][str1.length];
+            }
+            
+            // Get default response when no match found
+            getDefaultResponse() {
+                const defaultResponses = [
+                    "That's an interesting question! Could you provide more details so I can help you better?",
+                    "I'd be happy to help! Can you tell me more about what you're looking for?",
+                    "I understand you're asking about something specific. Could you rephrase that or give me more context?",
+                    "I'm here to assist you! Let me know if you can provide more information about your question."
+                ];
+                return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            }
+            
+            // Save conversation
+            saveConversation(userMessage, aiResponse) {
+                if (!this.currentChatId) {
+                    this.currentChatId = Date.now().toString();
+                    this.conversations.push({
+                        id: this.currentChatId,
+                        title: userMessage.substring(0, 50) + (userMessage.length > 50 ? '...' : ''),
+                        messages: [],
+                        timestamp: new Date().toISOString()
+                    });
+                }
+                
+                const currentChat = this.conversations.find(chat => chat.id === this.currentChatId);
+                if (currentChat) {
+                    currentChat.messages.push(
+                        { type: 'user', content: userMessage, timestamp: new Date().toISOString() },
+                        { type: 'ai', content: aiResponse, timestamp: new Date().toISOString() }
+                    );
+                }
+                
+                localStorage.setItem('conversations', JSON.stringify(this.conversations));
+                this.updateRecentChats();
+            }
+            
+            // Update recent chats display
+            updateRecentChats() {
+                const recentChatsContainer = document.getElementById('recent-chats-list');
+                const recentChats = this.conversations.slice(-5).reverse();
+                
+                recentChatsContainer.innerHTML = '';
+                
+                recentChats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors';
+                    chatItem.innerHTML = `
+                        <i class="fas fa-comment-dots text-xs text-gray-400"></i>
+                        <span class="truncate">${chat.title}</span>
+                    `;
+                    chatItem.addEventListener('click', () => this.loadChat(chat.id));
+                    recentChatsContainer.appendChild(chatItem);
+                });
+                
+                if (recentChats.length > 0) {
+                    const seeMoreBtn = document.createElement('button');
+                    seeMoreBtn.className = 'text-xs text-blue-600 hover:text-blue-700 mt-2 font-medium';
+                    seeMoreBtn.textContent = 'See more →';
+                    seeMoreBtn.addEventListener('click', () => showView('previous-chats-view'));
+                    recentChatsContainer.appendChild(seeMoreBtn);
+                }
+            }
+            
+            // Load specific chat
+            loadChat(chatId) {
+                const chat = this.conversations.find(c => c.id === chatId);
+                if (!chat) return;
+                
+                this.currentChatId = chatId;
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML = '';
+                
+                chat.messages.forEach(message => {
+                    addMessage(message.content, message.type);
+                });
+                
+                showView('chat-interface');
+            }
+            
+            // Start new chat
+            newChat() {
+                this.currentChatId = null;
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML = `
+                    <div class="max-w-4xl mx-auto space-y-4">
+                        <div class="text-center py-8">
+                            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                                <i class="fas fa-robot text-white text-3xl"></i>
+                            </div>
+                            <h1 class="text-3xl font-bold text-gray-800 mb-2">New Chat Started</h1>
+                            <p class="text-gray-600 mb-4">What would you like to discuss?</p>
+                        </div>
+                        <div class="flex justify-start">
+                            <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
+                                <p class="text-gray-800">Hello! I'm ready for a new conversation. What can I help you with today?</p>
+                                <span class="text-xs text-gray-500 mt-1 block">Just now</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                showView('chat-interface');
+            }
+            
+            // Search conversations
+            searchConversations(query) {
+                if (!query.trim()) return [];
+                
+                const results = [];
+                const searchTerm = query.toLowerCase();
+                
+                this.conversations.forEach(chat => {
+                    chat.messages.forEach(message => {
+                        if (message.content.toLowerCase().includes(searchTerm)) {
+                            results.push({
+                                chatId: chat.id,
+                                chatTitle: chat.title,
+                                message: message.content,
+                                type: message.type,
+                                timestamp: message.timestamp
+                            });
+                        }
+                    });
+                });
+                
+                return results.slice(0, 20); // Limit results
+            }
+        }
+        
+        // Initialize AI system
+        const ai = new SpurAI();
+        
         // State management
         let sidebarOpen = localStorage.getItem('sidebarOpen') !== 'false';
         let mobileMenuOpen = false;
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+        let currentView = 'chat-interface';
         
         // DOM elements
         const sidebar = document.getElementById('sidebar');
@@ -460,10 +857,28 @@
         // Initialize app
         function initializeApp() {
             updateUserInfo();
+            ai.updateRecentChats();
+            populateLibrary();
             if (window.innerWidth >= 900) {
                 updateSidebarState();
             }
             setupEventListeners();
+        }
+        
+        // Show specific view
+        function showView(viewId) {
+            const views = ['chat-interface', 'previous-chats-view', 'search-view', 'library-view', 'settings-view'];
+            views.forEach(view => {
+                const element = document.getElementById(view);
+                if (element) {
+                    element.classList.add('hidden');
+                }
+            });
+            const targetView = document.getElementById(viewId);
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                currentView = viewId;
+            }
         }
         
         // Update user info display
@@ -537,26 +952,23 @@
             addMessage(message, 'user');
             messageInput.value = '';
             
-            // Simulate AI response
+            // Get AI response
             setTimeout(() => {
-                const responses = [
-                    "That's an interesting question! Let me help you with that.",
-                    "I understand what you're asking. Here's what I think...",
-                    "Great question! Based on my knowledge, I can tell you that...",
-                    "I'm here to help! Let me provide you with some insights on that topic."
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                addMessage(randomResponse, 'ai');
-            }, 1000);
+                const aiResponse = ai.findBestResponse(message);
+                addMessage(aiResponse, 'ai');
+                ai.saveConversation(message, aiResponse);
+            }, 500);
         }
         
         // Add message to chat
         function addMessage(text, sender) {
+            const messagesContainer = chatMessages.querySelector('.mx-auto') || chatMessages;
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
             
             const messageContent = document.createElement('div');
-            messageContent.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 max-w-xs`;
+            messageContent.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 max-w-xs lg:max-w-md`;
             
             const messageText = document.createElement('p');
             messageText.textContent = text;
@@ -569,8 +981,168 @@
             messageContent.appendChild(timestamp);
             messageDiv.appendChild(messageContent);
             
-            chatMessages.appendChild(messageDiv);
+            messagesContainer.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Populate previous chats
+        function populatePreviousChats() {
+            const container = document.getElementById('previous-chats-content');
+            container.innerHTML = '';
+            
+            if (ai.conversations.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">No previous conversations found</p>';
+                return;
+            }
+            
+            ai.conversations.slice().reverse().forEach(chat => {
+                const chatDiv = document.createElement('div');
+                chatDiv.className = 'border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors';
+                chatDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-medium text-gray-800">${chat.title}</h3>
+                        <span class="text-xs text-gray-500">${new Date(chat.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">${chat.messages.length} messages</p>
+                `;
+                chatDiv.addEventListener('click', () => ai.loadChat(chat.id));
+                container.appendChild(chatDiv);
+            });
+        }
+        
+        // Search state
+        let searchResults = [];
+        let currentSearchIndex = 0;
+        
+        // Handle search with highlighting
+        function handleSearch() {
+            const query = document.getElementById('search-input').value;
+            const resultsContainer = document.getElementById('search-results');
+            
+            if (!query.trim()) {
+                resultsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">Enter a search term to find your conversations</p>';
+                searchResults = [];
+                currentSearchIndex = 0;
+                return;
+            }
+            
+            searchResults = ai.searchConversations(query);
+            currentSearchIndex = 0;
+            
+            if (searchResults.length === 0) {
+                resultsContainer.innerHTML = '<p class="text-gray-500 text-center py-8">No results found</p>';
+                return;
+            }
+            
+            displaySearchResults(query);
+        }
+        
+        // Display search results with highlighting
+        function displaySearchResults(query) {
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+            
+            // Search navigation
+            if (searchResults.length > 1) {
+                const navDiv = document.createElement('div');
+                navDiv.className = 'flex items-center justify-between mb-4 p-3 bg-blue-50 rounded-lg';
+                navDiv.innerHTML = `
+                    <span class="text-sm text-blue-800">Found ${searchResults.length} results</span>
+                    <div class="flex items-center space-x-2">
+                        <button id="prev-result" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors" ${currentSearchIndex === 0 ? 'disabled' : ''}>
+                            Previous
+                        </button>
+                        <span class="text-sm text-blue-800">${currentSearchIndex + 1} of ${searchResults.length}</span>
+                        <button id="next-result" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors" ${currentSearchIndex === searchResults.length - 1 ? 'disabled' : ''}>
+                            Next
+                        </button>
+                    </div>
+                `;
+                resultsContainer.appendChild(navDiv);
+                
+                // Add navigation event listeners
+                const prevBtn = document.getElementById('prev-result');
+                const nextBtn = document.getElementById('next-result');
+                
+                prevBtn.addEventListener('click', () => {
+                    if (currentSearchIndex > 0) {
+                        currentSearchIndex--;
+                        displaySearchResults(query);
+                    }
+                });
+                
+                nextBtn.addEventListener('click', () => {
+                    if (currentSearchIndex < searchResults.length - 1) {
+                        currentSearchIndex++;
+                        displaySearchResults(query);
+                    }
+                });
+            }
+            
+            // Display current result
+            const result = searchResults[currentSearchIndex];
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'border-2 border-blue-300 bg-blue-50 rounded-lg p-4 cursor-pointer transition-colors';
+            
+            // Highlight the search term
+            const highlightedMessage = highlightText(result.message, query);
+            
+            resultDiv.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-medium text-gray-800">${result.chatTitle}</h3>
+                    <span class="text-xs text-gray-500">${new Date(result.timestamp).toLocaleDateString()}</span>
+                </div>
+                <p class="text-sm text-gray-700 mb-2"><strong class="text-blue-800">${result.type === 'user' ? 'You' : 'AI'}:</strong></p>
+                <div class="text-sm text-gray-800 bg-white p-3 rounded border">${highlightedMessage}</div>
+                <button class="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm">
+                    Open Chat
+                </button>
+            `;
+            
+            resultDiv.addEventListener('click', () => ai.loadChat(result.chatId));
+            resultsContainer.appendChild(resultDiv);
+            
+            // Show other results (dimmed)
+            searchResults.forEach((otherResult, index) => {
+                if (index !== currentSearchIndex) {
+                    const otherDiv = document.createElement('div');
+                    otherDiv.className = 'border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors opacity-60 mt-3';
+                    otherDiv.innerHTML = `
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-medium text-gray-600">${otherResult.chatTitle}</h3>
+                            <span class="text-xs text-gray-400">${new Date(otherResult.timestamp).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-500"><strong>${otherResult.type === 'user' ? 'You' : 'AI'}:</strong> ${otherResult.message.substring(0, 80)}...</p>
+                    `;
+                    otherDiv.addEventListener('click', () => {
+                        currentSearchIndex = index;
+                        displaySearchResults(query);
+                    });
+                    resultsContainer.appendChild(otherDiv);
+                }
+            });
+        }
+        
+        // Highlight search terms in text
+        function highlightText(text, query) {
+            if (!query.trim()) return text;
+            
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+        }
+        
+        // Populate library
+        function populateLibrary() {
+            const container = document.getElementById('library-content');
+            container.innerHTML = `
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tools text-gray-400 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Library Coming Soon</h3>
+                    <p class="text-gray-500">We're working on building an amazing knowledge library for you!</p>
+                </div>
+            `;
         }
         
         // Setup event listeners
@@ -581,6 +1153,55 @@
             // Mobile menu
             mobileMenuToggle.addEventListener('click', toggleMobileMenu);
             mobileMenuClose.addEventListener('click', toggleMobileMenu);
+            
+            // Navigation buttons
+            document.getElementById('new-chat-btn').addEventListener('click', () => ai.newChat());
+            document.getElementById('mobile-new-chat-btn').addEventListener('click', () => {
+                ai.newChat();
+                toggleMobileMenu();
+            });
+            
+            document.getElementById('previous-chats-btn').addEventListener('click', () => {
+                populatePreviousChats();
+                showView('previous-chats-view');
+            });
+            document.getElementById('mobile-previous-chats-btn').addEventListener('click', () => {
+                populatePreviousChats();
+                showView('previous-chats-view');
+                toggleMobileMenu();
+            });
+            
+            document.getElementById('search-chat-btn').addEventListener('click', () => showView('search-view'));
+            document.getElementById('mobile-search-chat-btn').addEventListener('click', () => {
+                showView('search-view');
+                toggleMobileMenu();
+            });
+            
+            document.getElementById('library-btn').addEventListener('click', () => showView('library-view'));
+            document.getElementById('mobile-library-btn').addEventListener('click', () => {
+                showView('library-view');
+                toggleMobileMenu();
+            });
+            
+            document.getElementById('settings-btn').addEventListener('click', () => showView('settings-view'));
+            document.getElementById('mobile-settings-btn').addEventListener('click', () => {
+                showView('settings-view');
+                toggleMobileMenu();
+            });
+            
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', handleSearch);
+            
+            // Settings
+            document.getElementById('clear-data-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                    localStorage.removeItem('conversations');
+                    ai.conversations = [];
+                    ai.currentChatId = null;
+                    ai.updateRecentChats();
+                    alert('All data cleared successfully!');
+                }
+            });
             
             // Close mobile menu when clicking outside
             mobileMenu.addEventListener('click', (e) => {
@@ -631,7 +1252,7 @@
                 document.getElementById('signup-modal').classList.remove('show');
                 
                 // Add welcome message
-                addMessage(`Welcome ${name}! I'm excited to help you today.`, 'ai');
+                addMessage(`Welcome ${name}! I'm excited to help you today. I've been trained on various topics and I'm ready to assist you.`, 'ai');
             });
             
             // Window resize
@@ -666,5 +1287,5 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96771543e1770226',t:'MTc1MzkwMTg2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'967732e592079e45',t:'MTc1MzkwMzA3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
