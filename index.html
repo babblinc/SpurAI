@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+
+<script src="data.js"></script>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Babbl Spur AI- Your personal AI for writing, coding, & research - </title>
+    <title>Spur AI - Chat Interface</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="data.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -549,36 +552,76 @@
         // AI System with Learning Capabilities
         class SpurAI {
             constructor() {
-                this.trainingData = window.aiTrainingData || [];
+                // Load training data from external file or fallback to embedded data
+                this.trainingData = window.aiTrainingData || this.getDefaultTrainingData();
                 this.conversations = JSON.parse(localStorage.getItem('conversations')) || [];
                 this.currentChatId = null;
+                
+                // Debug: Log training data to verify it's loaded
+                console.log('Training data loaded:', this.trainingData.length, 'entries');
+            }
+            
+            // Fallback training data if external file not loaded
+            getDefaultTrainingData() {
+                return [
+                    {
+                        question: "What is Spur AI?",
+                        answer: "Spur AI is an advanced conversational AI assistant created by Babbl Soft. I'm designed to help you with various tasks, answer questions, and provide intelligent insights."
+                    },
+                    {
+                        question: "hello",
+                        answer: "Hello! I'm Spur AI, your intelligent assistant. How can I help you today?"
+                    },
+                    {
+                        question: "hi",
+                        answer: "Hi there! I'm here to help you with any questions or tasks you have. What would you like to know?"
+                    },
+                    {
+                        question: "test",
+                        answer: "I'm working perfectly! This is a test response to confirm I can understand and respond to your messages."
+                    }
+                ];
             }
             
             // Find best response based on training data
             findBestResponse(userMessage) {
-                const message = userMessage.toLowerCase();
+                const message = userMessage.toLowerCase().trim();
                 let bestMatch = null;
                 let highestScore = 0;
                 
+                // First try exact matches and very close matches
                 for (const data of this.trainingData) {
-                    const question = data.question ? data.question.toLowerCase() : '';
+                    const question = data.question ? data.question.toLowerCase().trim() : '';
+                    
+                    // Check for exact match first
+                    if (message === question) {
+                        return data.answer;
+                    }
+                    
+                    // Check if user message contains the question or vice versa
+                    if (message.includes(question) || question.includes(message)) {
+                        if (question.length > 3) { // Avoid matching very short strings
+                            return data.answer;
+                        }
+                    }
                     
                     // Calculate multiple types of similarity
                     const exactScore = this.calculateSimilarity(message, question);
                     const keywordScore = this.calculateKeywordMatch(message, question);
                     const semanticScore = this.calculateSemanticMatch(message, question);
+                    const containsScore = this.calculateContainsMatch(message, question);
                     
-                    // Weighted combination of scores
-                    const finalScore = (exactScore * 0.4) + (keywordScore * 0.4) + (semanticScore * 0.2);
+                    // Weighted combination of scores (lowered threshold)
+                    const finalScore = (exactScore * 0.3) + (keywordScore * 0.3) + (semanticScore * 0.2) + (containsScore * 0.2);
                     
-                    if (finalScore > highestScore && finalScore > 0.3) {
+                    if (finalScore > highestScore && finalScore > 0.15) { // Lowered threshold
                         highestScore = finalScore;
                         bestMatch = data;
                     }
                 }
                 
                 if (bestMatch) {
-                    return bestMatch.answer || "I understand what you're asking about.";
+                    return bestMatch.answer || "I found information about that topic.";
                 }
                 
                 return this.getDefaultResponse();
@@ -656,6 +699,25 @@
                 return Math.min(semanticScore, 1.0);
             }
             
+            // Calculate contains matching - checks if key phrases are contained
+            calculateContainsMatch(userMessage, questionText) {
+                const userWords = userMessage.split(' ').filter(word => word.length > 2);
+                const questionWords = questionText.split(' ').filter(word => word.length > 2);
+                
+                let containsScore = 0;
+                let totalWords = Math.max(userWords.length, questionWords.length);
+                
+                for (const userWord of userWords) {
+                    for (const questionWord of questionWords) {
+                        if (userWord.includes(questionWord) || questionWord.includes(userWord)) {
+                            containsScore += 1;
+                        }
+                    }
+                }
+                
+                return totalWords > 0 ? Math.min(containsScore / totalWords, 1.0) : 0;
+            }
+            
             // Extract meaningful keywords from text
             extractKeywords(text) {
                 const stopWords = ['the', 'is', 'at', 'which', 'on', 'and', 'a', 'to', 'are', 'as', 'was', 'with', 'for', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'of', 'in', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'an', 'but', 'or', 'so', 'than', 'too', 'very', 'just', 'now', 'then', 'there', 'here', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now'];
@@ -718,13 +780,86 @@
                 return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
             }
             
+            // Method to reload training data (useful for testing)
+            reloadTrainingData() {
+                this.trainingData = window.aiTrainingData || this.getDefaultTrainingData();
+                console.log('Training data reloaded:', this.trainingData.length, 'entries');
+                return this.trainingData.length;
+            }
+            
+            // Extract meaningful title from conversation
+            generateChatTitle(userMessage, aiResponse) {
+                const combinedText = (userMessage + ' ' + aiResponse).toLowerCase();
+                
+                // Common nouns and topics that make good titles
+                const titleKeywords = [
+                    // Technology
+                    'artificial intelligence', 'ai', 'machine learning', 'programming', 'coding', 'software', 'computer', 'technology', 'internet', 'website', 'app', 'database', 'algorithm', 'python', 'javascript', 'html', 'css',
+                    
+                    // Science
+                    'science', 'physics', 'chemistry', 'biology', 'mathematics', 'research', 'experiment', 'theory', 'hypothesis', 'data', 'analysis',
+                    
+                    // Business
+                    'business', 'marketing', 'finance', 'investment', 'startup', 'company', 'management', 'strategy', 'sales', 'customer', 'product', 'service',
+                    
+                    // Education
+                    'education', 'learning', 'school', 'university', 'student', 'teacher', 'course', 'study', 'homework', 'exam', 'degree',
+                    
+                    // Health
+                    'health', 'medicine', 'doctor', 'hospital', 'treatment', 'disease', 'fitness', 'exercise', 'nutrition', 'diet',
+                    
+                    // General topics
+                    'recipe', 'cooking', 'food', 'travel', 'music', 'movie', 'book', 'art', 'history', 'culture', 'language', 'writing', 'creative', 'design', 'photography',
+                    
+                    // Common question words that indicate topics
+                    'how to', 'what is', 'why does', 'when to', 'where is'
+                ];
+                
+                // Find the best keyword match
+                let bestTitle = '';
+                let longestMatch = 0;
+                
+                for (const keyword of titleKeywords) {
+                    if (combinedText.includes(keyword) && keyword.length > longestMatch) {
+                        longestMatch = keyword.length;
+                        bestTitle = keyword;
+                    }
+                }
+                
+                // If we found a good keyword, capitalize it properly
+                if (bestTitle) {
+                    return bestTitle.split(' ')
+                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ');
+                }
+                
+                // Fallback: extract important nouns from the user message
+                const words = userMessage.toLowerCase().split(/\s+/);
+                const stopWords = ['the', 'is', 'at', 'which', 'on', 'and', 'a', 'to', 'are', 'as', 'was', 'with', 'for', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'of', 'in', 'by', 'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'among', 'an', 'but', 'or', 'so', 'than', 'too', 'very', 'just', 'now', 'then', 'there', 'here', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same'];
+                
+                const meaningfulWords = words.filter(word => 
+                    word.length > 3 && 
+                    !stopWords.includes(word) && 
+                    /^[a-zA-Z]+$/.test(word)
+                );
+                
+                if (meaningfulWords.length > 0) {
+                    const firstWord = meaningfulWords[0];
+                    return firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
+                }
+                
+                // Final fallback
+                return userMessage.substring(0, 30) + (userMessage.length > 30 ? '...' : '');
+            }
+            
             // Save conversation
             saveConversation(userMessage, aiResponse) {
                 if (!this.currentChatId) {
                     this.currentChatId = Date.now().toString();
+                    const chatTitle = this.generateChatTitle(userMessage, aiResponse);
                     this.conversations.push({
                         id: this.currentChatId,
-                        title: userMessage.substring(0, 50) + (userMessage.length > 50 ? '...' : ''),
+                        title: chatTitle,
                         messages: [],
                         timestamp: new Date().toISOString()
                     });
@@ -909,13 +1044,20 @@
         
         // Update sidebar state
         function updateSidebarState() {
+            if (window.innerWidth < 900) {
+                // Mobile - don't apply sidebar states
+                return;
+            }
+            
             if (sidebarOpen) {
                 sidebar.classList.remove('sidebar-collapsed');
                 sidebar.classList.add('sidebar-expanded');
+                sidebar.style.width = '280px';
                 mainContent.style.marginLeft = '280px';
             } else {
                 sidebar.classList.remove('sidebar-expanded');
                 sidebar.classList.add('sidebar-collapsed');
+                sidebar.style.width = '70px';
                 mainContent.style.marginLeft = '70px';
             }
             localStorage.setItem('sidebarOpen', sidebarOpen);
@@ -1287,5 +1429,5 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'967732e592079e45',t:'MTc1MzkwMzA3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9677710af6ec7521',t:'MTc1MzkwNTYxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
