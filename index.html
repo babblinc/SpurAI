@@ -17,15 +17,13 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        .mobile-menu-enter {
-            transform: translateY(-100%);
-            opacity: 0;
+        .mobile-menu-slide {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-out;
         }
         
-        .mobile-menu-enter-active {
-            transform: translateY(0);
-            opacity: 1;
-            transition: all 0.3s ease-out;
+        .mobile-menu-slide.open {
+            transform: translateX(0);
         }
         
         .tooltip {
@@ -47,12 +45,6 @@
         
         .nav-item:hover {
             background-color: rgba(59, 130, 246, 0.1);
-        }
-        
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
         }
         
         .sidebar-collapsed .nav-label {
@@ -87,12 +79,24 @@
             width: 280px !important;
         }
         
+        .modal {
+            display: none;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
         @media (max-width: 899px) {
             .desktop-sidebar {
                 display: none !important;
             }
             .mobile-header {
                 display: flex !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding-top: 70px;
             }
         }
         
@@ -102,6 +106,9 @@
             }
             .mobile-header {
                 display: none !important;
+            }
+            .main-content {
+                padding-top: 0;
             }
         }
     </style>
@@ -113,15 +120,16 @@
         <div class="p-4 border-b border-gray-100">
             <div class="flex items-center justify-between">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-brain text-white text-lg"></i>
+                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-robot text-white text-lg"></i>
                     </div>
-                    <span class="sidebar-title text-xl font-semibold text-gray-800">Spur AI</span>
+                    <span class="sidebar-title text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Spur AI</span>
                 </div>
-                <button id="sidebar-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-chevron-left text-gray-600"></i>
-                </button>
             </div>
+            <button id="sidebar-toggle" class="mt-2 p-2 rounded-lg hover:bg-gray-100 transition-colors flex items-center space-x-2 text-gray-600">
+                <i class="fas fa-bars"></i>
+                <span class="sidebar-title text-sm">Toggle Menu</span>
+            </button>
         </div>
         
         <!-- Navigation Items -->
@@ -173,7 +181,7 @@
                 
                 <!-- About -->
                 <div class="nav-item relative tooltip-trigger">
-                    <button class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
+                    <button id="about-btn" class="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:text-blue-600 transition-colors">
                         <i class="fas fa-info-circle nav-icon text-gray-600"></i>
                         <span class="nav-label font-medium">About</span>
                     </button>
@@ -198,7 +206,7 @@
             <div class="recent-chats-section mt-6 px-3">
                 <div class="border-t border-gray-100 pt-4">
                     <h3 class="text-sm font-semibold text-gray-500 mb-3">Recent Chats</h3>
-                    <div class="space-y-1">
+                    <div class="space-y-1" id="recent-chats-list">
                         <div class="chat-item flex items-center space-x-2 px-2 py-1.5 rounded text-sm text-gray-600 cursor-pointer transition-colors">
                             <i class="fas fa-comment-dots text-xs text-gray-400"></i>
                             <span class="truncate">How to learn HTML</span>
@@ -221,43 +229,32 @@
         
         <!-- User Info Footer -->
         <div class="border-t border-gray-100 p-4">
-            <div class="flex items-center space-x-3 relative tooltip-trigger">
+            <div class="flex items-center space-x-3 relative tooltip-trigger" id="user-info-section">
                 <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <i class="fas fa-user text-blue-600"></i>
                 </div>
                 <div class="user-details flex-1 min-w-0">
-                    <div class="text-sm font-medium text-gray-800 truncate">John Doe</div>
-                    <div class="text-xs text-gray-500 truncate">john@example.com</div>
+                    <div class="text-sm font-medium text-gray-800 truncate" id="user-name">Guest User</div>
+                    <div class="text-xs text-gray-500 truncate" id="user-email">Not signed in</div>
                 </div>
+                <button id="auth-btn" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors">
+                    Sign Up
+                </button>
                 <div class="tooltip absolute left-full ml-2 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap">
-                    John Doe
+                    User Profile
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Mobile Header -->
-    <div class="mobile-header bg-white border-b border-gray-200 px-4 py-3 shadow-sm" style="display: none;">
+    <div class="mobile-header fixed top-0 left-0 right-0 bg-white border-b border-gray-200 px-4 py-3 shadow-sm z-50" style="display: none;">
         <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-brain text-white"></i>
-                    </div>
-                    <span class="text-lg font-semibold text-gray-800">Spur AI</span>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-robot text-white"></i>
                 </div>
-                
-                <div class="flex items-center space-x-3">
-                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="New Chat">
-                        <i class="fas fa-plus text-gray-600"></i>
-                    </button>
-                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Previous Chats">
-                        <i class="fas fa-history text-gray-600"></i>
-                    </button>
-                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" title="Search Chat">
-                        <i class="fas fa-search text-gray-600"></i>
-                    </button>
-                </div>
+                <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Spur AI</span>
             </div>
             
             <button id="mobile-menu-toggle" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
@@ -266,16 +263,16 @@
         </div>
     </div>
     
-    <!-- Mobile Menu Dropdown -->
+    <!-- Mobile Menu Dropdown (Right Side) -->
     <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div class="bg-white w-full max-w-sm ml-auto h-full shadow-xl">
+        <div class="bg-white w-full max-w-sm ml-auto h-full shadow-xl mobile-menu-slide">
             <div class="p-4 border-b border-gray-100">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-brain text-white"></i>
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-robot text-white"></i>
                         </div>
-                        <span class="text-lg font-semibold text-gray-800">Spur AI</span>
+                        <span class="text-lg font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Spur AI</span>
                     </div>
                     <button id="mobile-menu-close" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
                         <i class="fas fa-times text-gray-600"></i>
@@ -301,7 +298,7 @@
                         <i class="fas fa-bookmark text-gray-600"></i>
                         <span class="font-medium">Library</span>
                     </button>
-                    <button class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <button id="mobile-about-btn" class="w-full flex items-center space-x-3 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                         <i class="fas fa-info-circle text-gray-600"></i>
                         <span class="font-medium">About</span>
                     </button>
@@ -317,9 +314,12 @@
                             <i class="fas fa-user text-blue-600"></i>
                         </div>
                         <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-800">John Doe</div>
-                            <div class="text-xs text-gray-500">john@example.com</div>
+                            <div class="text-sm font-medium text-gray-800" id="mobile-user-name">Guest User</div>
+                            <div class="text-xs text-gray-500" id="mobile-user-email">Not signed in</div>
                         </div>
+                        <button id="mobile-auth-btn" class="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition-colors">
+                            Sign Up
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -327,30 +327,116 @@
     </div>
     
     <!-- Main Content Area -->
-    <div id="main-content" class="sidebar-transition" style="margin-left: 280px;">
-        <div class="p-8">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                    <div class="text-center">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-brain text-white text-3xl"></i>
+    <div id="main-content" class="main-content sidebar-transition" style="margin-left: 280px;">
+        <!-- Chat Interface -->
+        <div class="flex flex-col h-screen">
+            <!-- Chat Messages Area -->
+            <div class="flex-1 overflow-y-auto p-4" id="chat-messages">
+                <div class="max-w-4xl mx-auto space-y-4">
+                    <!-- Welcome Message -->
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                            <i class="fas fa-robot text-white text-3xl"></i>
                         </div>
                         <h1 class="text-3xl font-bold text-gray-800 mb-2">Welcome to Spur AI</h1>
-                        <p class="text-gray-600 mb-8">Start a conversation or browse your previous chats</p>
-                        
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
-                                <i class="fas fa-plus"></i>
-                                <span>Start New Chat</span>
-                            </button>
-                            <button class="border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
-                                <i class="fas fa-history"></i>
-                                <span>View Previous Chats</span>
-                            </button>
+                        <p class="text-gray-600 mb-4">Your intelligent assistant is ready to help!</p>
+                    </div>
+                    
+                    <!-- Sample Messages -->
+                    <div class="flex justify-start">
+                        <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
+                            <p class="text-gray-800">Hello! I'm Spur AI. How can I assist you today?</p>
+                            <span class="text-xs text-gray-500 mt-1 block">Just now</span>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            <!-- Message Input Area -->
+            <div class="border-t border-gray-200 p-4 bg-white">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 relative">
+                            <input 
+                                type="text" 
+                                id="message-input" 
+                                placeholder="Type your message here..." 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                        </div>
+                        <button 
+                            id="send-btn" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg transition-colors flex items-center justify-center"
+                        >
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- About Modal -->
+    <div id="about-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-robot text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-3">About Spur AI</h2>
+                <p class="text-gray-600 mb-4">Spur AI is an advanced conversational AI assistant designed to help you with various tasks, answer questions, and provide intelligent insights.</p>
+                
+                <div class="space-y-2 mb-6">
+                    <p class="text-sm text-gray-500">Learn more about our AI technology:</p>
+                    <div class="flex flex-col space-y-2">
+                        <a href="https://about.babblsoft.com" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            <i class="fas fa-external-link-alt mr-1"></i>about.babblsoft.com
+                        </a>
+                        <a href="https://aistudio.babblsoft.com" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            <i class="fas fa-external-link-alt mr-1"></i>aistudio.babblsoft.com
+                        </a>
+                        <a href="https://spur.babbl.com" target="_blank" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                            <i class="fas fa-external-link-alt mr-1"></i>spur.babbl.com
+                        </a>
+                    </div>
+                </div>
+                
+                <button id="close-about" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
+        <div class="bg-white rounded-xl p-6 max-w-md mx-4 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                    <i class="fas fa-user-plus text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Join Spur AI</h2>
+                <p class="text-gray-600">Create your account to get started</p>
+            </div>
+            
+            <form id="signup-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="signup-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" id="signup-email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">
+                        Sign Up
+                    </button>
+                    <button type="button" id="close-signup" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     
@@ -358,6 +444,7 @@
         // State management
         let sidebarOpen = localStorage.getItem('sidebarOpen') !== 'false';
         let mobileMenuOpen = false;
+        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
         
         // DOM elements
         const sidebar = document.getElementById('sidebar');
@@ -366,31 +453,56 @@
         const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
         const mobileMenu = document.getElementById('mobile-menu');
         const mobileMenuClose = document.getElementById('mobile-menu-close');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const chatMessages = document.getElementById('chat-messages');
         
-        // Initialize sidebar state
-        function initializeSidebar() {
+        // Initialize app
+        function initializeApp() {
+            updateUserInfo();
             if (window.innerWidth >= 900) {
                 updateSidebarState();
+            }
+            setupEventListeners();
+        }
+        
+        // Update user info display
+        function updateUserInfo() {
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+            const mobileUserName = document.getElementById('mobile-user-name');
+            const mobileUserEmail = document.getElementById('mobile-user-email');
+            const authBtn = document.getElementById('auth-btn');
+            const mobileAuthBtn = document.getElementById('mobile-auth-btn');
+            
+            if (currentUser) {
+                userName.textContent = currentUser.name;
+                userEmail.textContent = currentUser.email;
+                mobileUserName.textContent = currentUser.name;
+                mobileUserEmail.textContent = currentUser.email;
+                authBtn.textContent = 'Sign Out';
+                mobileAuthBtn.textContent = 'Sign Out';
+            } else {
+                userName.textContent = 'Guest User';
+                userEmail.textContent = 'Not signed in';
+                mobileUserName.textContent = 'Guest User';
+                mobileUserEmail.textContent = 'Not signed in';
+                authBtn.textContent = 'Sign Up';
+                mobileAuthBtn.textContent = 'Sign Up';
             }
         }
         
         // Update sidebar state
         function updateSidebarState() {
-            const toggleIcon = sidebarToggle.querySelector('i');
-            
             if (sidebarOpen) {
                 sidebar.classList.remove('sidebar-collapsed');
                 sidebar.classList.add('sidebar-expanded');
                 mainContent.style.marginLeft = '280px';
-                toggleIcon.className = 'fas fa-chevron-left text-gray-600';
             } else {
                 sidebar.classList.remove('sidebar-expanded');
                 sidebar.classList.add('sidebar-collapsed');
                 mainContent.style.marginLeft = '70px';
-                toggleIcon.className = 'fas fa-chevron-right text-gray-600';
             }
-            
-            // Save state
             localStorage.setItem('sidebarOpen', sidebarOpen);
         }
         
@@ -403,55 +515,156 @@
         // Toggle mobile menu
         function toggleMobileMenu() {
             mobileMenuOpen = !mobileMenuOpen;
+            const menuSlide = mobileMenu.querySelector('.mobile-menu-slide');
+            
             if (mobileMenuOpen) {
                 mobileMenu.classList.remove('hidden');
+                setTimeout(() => menuSlide.classList.add('open'), 10);
                 document.body.style.overflow = 'hidden';
             } else {
-                mobileMenu.classList.add('hidden');
+                menuSlide.classList.remove('open');
+                setTimeout(() => mobileMenu.classList.add('hidden'), 300);
                 document.body.style.overflow = 'auto';
             }
         }
         
-        // Event listeners
-        sidebarToggle.addEventListener('click', toggleSidebar);
-        mobileMenuToggle.addEventListener('click', toggleMobileMenu);
-        mobileMenuClose.addEventListener('click', toggleMobileMenu);
+        // Send message
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            messageInput.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const responses = [
+                    "That's an interesting question! Let me help you with that.",
+                    "I understand what you're asking. Here's what I think...",
+                    "Great question! Based on my knowledge, I can tell you that...",
+                    "I'm here to help! Let me provide you with some insights on that topic."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse, 'ai');
+            }, 1000);
+        }
         
-        // Close mobile menu when clicking outside
-        mobileMenu.addEventListener('click', (e) => {
-            if (e.target === mobileMenu) {
+        // Add message to chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = `${sender === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'} rounded-lg p-3 max-w-xs`;
+            
+            const messageText = document.createElement('p');
+            messageText.textContent = text;
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = `text-xs ${sender === 'user' ? 'text-blue-100' : 'text-gray-500'} mt-1 block`;
+            timestamp.textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageContent.appendChild(messageText);
+            messageContent.appendChild(timestamp);
+            messageDiv.appendChild(messageContent);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Sidebar toggle
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // Mobile menu
+            mobileMenuToggle.addEventListener('click', toggleMobileMenu);
+            mobileMenuClose.addEventListener('click', toggleMobileMenu);
+            
+            // Close mobile menu when clicking outside
+            mobileMenu.addEventListener('click', (e) => {
+                if (e.target === mobileMenu) {
+                    toggleMobileMenu();
+                }
+            });
+            
+            // Message sending
+            sendBtn.addEventListener('click', sendMessage);
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // About modal
+            document.getElementById('about-btn').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.add('show');
+            });
+            
+            document.getElementById('mobile-about-btn').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.add('show');
                 toggleMobileMenu();
-            }
-        });
+            });
+            
+            document.getElementById('close-about').addEventListener('click', () => {
+                document.getElementById('about-modal').classList.remove('show');
+            });
+            
+            // Auth functionality
+            document.getElementById('auth-btn').addEventListener('click', handleAuth);
+            document.getElementById('mobile-auth-btn').addEventListener('click', handleAuth);
+            
+            // Signup modal
+            document.getElementById('close-signup').addEventListener('click', () => {
+                document.getElementById('signup-modal').classList.remove('show');
+            });
+            
+            document.getElementById('signup-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('signup-name').value;
+                const email = document.getElementById('signup-email').value;
+                
+                currentUser = { name, email };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserInfo();
+                document.getElementById('signup-modal').classList.remove('show');
+                
+                // Add welcome message
+                addMessage(`Welcome ${name}! I'm excited to help you today.`, 'ai');
+            });
+            
+            // Window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 900) {
+                    const menuSlide = mobileMenu.querySelector('.mobile-menu-slide');
+                    mobileMenu.classList.add('hidden');
+                    menuSlide.classList.remove('open');
+                    mobileMenuOpen = false;
+                    document.body.style.overflow = 'auto';
+                    updateSidebarState();
+                } else {
+                    mainContent.style.marginLeft = '0';
+                }
+            });
+        }
         
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 900) {
-                // Desktop view
-                mobileMenu.classList.add('hidden');
-                mobileMenuOpen = false;
-                document.body.style.overflow = 'auto';
-                updateSidebarState();
+        // Handle authentication
+        function handleAuth() {
+            if (currentUser) {
+                // Sign out
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                updateUserInfo();
+                addMessage("You've been signed out. Thanks for using Spur AI!", 'ai');
             } else {
-                // Mobile view
-                mainContent.style.marginLeft = '0';
+                // Show signup modal
+                document.getElementById('signup-modal').classList.add('show');
             }
-        });
-        
-        // Sample button interactions
-        document.querySelectorAll('button').forEach(button => {
-            if (!button.id || !['sidebar-toggle', 'mobile-menu-toggle', 'mobile-menu-close'].includes(button.id)) {
-                button.addEventListener('click', (e) => {
-                    const buttonText = button.textContent.trim();
-                    if (buttonText && !buttonText.includes('See more')) {
-                        alert(`${buttonText} clicked! This would open the ${buttonText.toLowerCase()} feature.`);
-                    }
-                });
-            }
-        });
+        }
         
         // Initialize on load
-        document.addEventListener('DOMContentLoaded', initializeSidebar);
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9677028a1698c8ed',t:'MTc1MzkwMTA5My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96771543e1770226',t:'MTc1MzkwMTg2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
